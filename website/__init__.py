@@ -34,7 +34,7 @@ def create_app():
     return app
 
 def create_database(app):
-    if not path.exists("website/" + DB_NAME):
+    if not path.exists("website/" + "nwkgocqjrnbdnl:079b698c90f7ad4a6562fd41bfcb500720e9b6486c02626f2175a02f2f4f3e33@ec2-34-199-200-115.compute-1.amazonaws.com:5432/d109afai1n644g"):
         db.create_all(app=app)
         print("Created database!")
 
