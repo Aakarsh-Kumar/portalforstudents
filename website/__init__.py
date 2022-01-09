@@ -4,14 +4,24 @@ from os import path
 from flask_login import LoginManager
 
 db = SQLAlchemy()
-DB_NAME = "database.db"
+
+ENV = 'DEP'
+DB_NAME = 'database.db'
+URL = 'postgresql://nwkgocqjrnbdnl:079b698c90f7ad4a6562fd41bfcb500720e9b6486c02626f2175a02f2f4f3e33@ec2-34-199-200-115.compute-1.amazonaws.com:5432/d109afai1n644g'
+
 
 
 def create_app():
-    app = Flask(__name__)
-    app.config['SECRET_KEY'] = "helloworld"
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://nwkgocqjrnbdnl:079b698c90f7ad4a6562fd41bfcb500720e9b6486c02626f2175a02f2f4f3e33@ec2-34-199-200-115.compute-1.amazonaws.com:5432/d109afai1n644g'
-    db.init_app(app)
+    if ENV == 'DEV':
+        app = Flask(__name__)
+        app.config['SECRET_KEY'] = "helloworld"
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + DB_NAME
+        db.init_app(app)
+    else:
+        app = Flask(__name__)
+        app.config['SECRET_KEY'] = "helloworld"
+        app.config['SQLALCHEMY_DATABASE_URI'] = URL
+        db.init_app(app)
 
     from .views import views
     from .auth import auth
@@ -34,7 +44,12 @@ def create_app():
     return app
 
 def create_database(app):
-    if not path.exists("website/" + "nwkgocqjrnbdnl:079b698c90f7ad4a6562fd41bfcb500720e9b6486c02626f2175a02f2f4f3e33@ec2-34-199-200-115.compute-1.amazonaws.com:5432/d109afai1n644g"):
-        db.create_all(app=app)
-        print("Created database!")
+    if ENV == 'DEV':
+        if not path.exists("website/" + DB_NAME):
+            db.create_all()
+            print("Created database!")
+    else:
+        if not path.exists("website/" + URL):
+            db.create_all(app=app)
+            print("Created database!")
 

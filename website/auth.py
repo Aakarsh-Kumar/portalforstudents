@@ -17,7 +17,7 @@ def login():
         if user:
             if user.id!=1:
                 if user.userimposterid == 1:
-                    flash("Account id Band", category='error')
+                    flash("Account id Baned", category='error')
                     return render_template("login.html", user=current_user)
             if check_password_hash(user.password, password):
                 flash("Logged in!", category='success')

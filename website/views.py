@@ -15,37 +15,35 @@ def intro():
 
 @views.route("/")
 @views.route("/home")
-@login_required
+# @login_required
 def home():
     user=current_user
-    if user:
+    if user.is_authenticated:
         flash("Hey you migth wanna check for new messages",category='sucess')
-    q = request.args.get('q')
-    if q:
-        posts = Post.query.filter(Post.text.contains(q))
+        q = request.args.get('q')
+        if q:
+            posts = Post.query.filter(Post.text.contains(q))
+        else:
+            posts = Post.query.all()
+        return render_template("home.html", user=current_user, posts=posts)
     else:
-        posts = Post.query.all()
-    return render_template("home.html", user=current_user, posts=posts)
+        return render_template('Intro.html')
 
 
 @views.route("/create-post", methods=['GET', 'POST'])
 @login_required
 def create_post():
+    if User.query.filter_by(username=current_user.username).first().userimposterid == 1:
+        flash("You are banned.",category='error')
+        return redirect(url_for('auth.logout'))
     if request.method == "POST":
         text = request.form.get('text')
         pic = request.files['pic']
         school = request.form.get('school')
         Course = request.form.get('Course')
 
-        if not text:
+        if not text and not Course and not school:
             flash('Post cannot be empty', category='error')
-        if not pic:
-            flash('Post cannot be empty', category='error')
-        if not Course:
-            flash('Post cannot be empty', category='error')
-        if not school:
-            flash('Post cannot be empty', category='error')
-
         else:
             filename = secure_filename(pic.filename)
             mimetype = pic.mimetype
@@ -161,7 +159,7 @@ def Admin():
 @views.route("/Admin-delete/<author>")
 @login_required
 def Admindelete(author):
-    user = User.query.filter_by(id=author).first()
+    user = User.query.filter_by(username=author).first()
     if user:
         db.session()
         user2 = user.userimposterid
@@ -365,7 +363,7 @@ def delete_message(id):
 @views.route("/Admin-undelete/<author>")
 @login_required
 def AdminUndelete(author):
-    user = User.query.filter_by(id=author).first()
+    user = User.query.filter_by(username=author).first()
     if user:
         db.session()
         user2 = user.userimposterid

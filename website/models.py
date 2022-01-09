@@ -15,6 +15,10 @@ class User(db.Model, UserMixin):
     messages = db.relationship('Message', backref='user', passive_deletes=True)
     chat_comments = db.relationship('Chat_comment', backref='user', passive_deletes=True)
 
+    @staticmethod
+    def is_authenticated(self):
+        return True
+
 
 
 class Post(db.Model):
